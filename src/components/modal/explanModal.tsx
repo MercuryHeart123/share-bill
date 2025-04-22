@@ -47,7 +47,6 @@ const ExplanModal = ({
     }));
   };
   const prevCheckedItemsRef = useRef<Record<string, boolean>>({});
-  console.log("person", person);
 
   useEffect(() => {
     const prev = prevCheckedItemsRef.current;
@@ -56,11 +55,11 @@ const ExplanModal = ({
     );
 
     if (changedKeys.length > 0) {
-      console.log("Changed items:", changedKeys);
       changedKeys.forEach((key) => {
         const [billIndex, itemIndex] = key.split("_").map(Number);
         const deepClonedBills = JSON.parse(JSON.stringify(bills)) as Bill[];
         const dItem = deepClonedBills[billIndex].items[itemIndex];
+        //TO DO: dupe item fix pls
         if (checkedItems[key]) {
           dItem.persons.push(person.id);
         } else {
@@ -76,14 +75,6 @@ const ExplanModal = ({
 
     prevCheckedItemsRef.current = checkedItems;
   }, [checkedItems, bills, person, setBills]);
-  console.log(
-    bills,
-    bills[0].items.reduce((acc, item) => {
-      console.log(item.sum, typeof item.sum);
-
-      return acc + item.sum;
-    }, 0)
-  );
 
   return (
     <>
@@ -116,8 +107,6 @@ const ExplanModal = ({
               </IonRow>
               {bill.items.map((item, itemIndex) => {
                 const key = `${billIndex}_${itemIndex}`;
-                console.log(item.sum, typeof item.sum);
-
                 return (
                   <IonRow key={itemIndex}>
                     <IonCol size="3" sizeMd="3" className="ion-text-center">
@@ -162,6 +151,18 @@ const ExplanModal = ({
                     }, 0);
                     return acc + billSum;
                   }, 0)}
+                </IonCol>
+                <IonCol size="3" sizeMd="3" className="ion-text-center">
+                  {bill.items.reduce((acc, item) => {
+                    const billSum = item.persons.reduce((sum, iPerson) => {
+                      if (iPerson === person.id) {
+                        return sum + 1;
+                      }
+                      return sum;
+                    }, 0);
+                    return acc + billSum;
+                  }, 0)}{" "}
+                  รายการ
                 </IonCol>
               </IonRow>
             </IonGrid>
