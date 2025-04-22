@@ -15,7 +15,7 @@ import { createWorker } from "tesseract.js";
 import { usePhotoGallery } from "../../hook/usePhotoGallery";
 import axios from "axios";
 import { add, camera, pencil } from "ionicons/icons";
-import { Bill, Item } from "../../pages/Tab2";
+import { Bill, Item, Person } from "../../pages/Tab2";
 import NameInput from "../input/name";
 
 interface OcrRecord {
@@ -47,12 +47,18 @@ const exampleSchema: OcrRecord[] = [
 ];
 
 interface BillComponentProps {
+  persons: Person[];
   index: number;
   bill: Bill;
   setBills: React.Dispatch<React.SetStateAction<Bill[]>>;
 }
 
-const BillComponent = ({ index, bill, setBills }: BillComponentProps) => {
+const BillComponent = ({
+  persons,
+  index,
+  bill,
+  setBills,
+}: BillComponentProps) => {
   const [items, setItems] = useState<Item[]>(bill.items);
   const [name, setName] = useState(bill.name);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -143,6 +149,11 @@ const BillComponent = ({ index, bill, setBills }: BillComponentProps) => {
     );
   }, [name, setBills, index]);
 
+  useEffect(() => {
+    console.log("bill on change", bill);
+
+    setItems(bill.items);
+  }, [bill]);
   return (
     <IonCard className="ion-padding">
       <IonToolbar>
@@ -180,7 +191,9 @@ const BillComponent = ({ index, bill, setBills }: BillComponentProps) => {
       {items.map((item, index) => (
         <IonRow key={index}>
           <IonCol size="4" sizeMd="4" className="ion-text-center">
-            {item.persons.map((person, i) => {
+            {item.persons.map((iPerson, i) => {
+              const person = persons.find((p) => p.id === iPerson);
+              if (!person) return null;
               return (
                 <IonChip
                   key={i}
@@ -225,7 +238,7 @@ const BillComponent = ({ index, bill, setBills }: BillComponentProps) => {
                 setItems(
                   (prev) =>
                     prev.map((rec, i) =>
-                      i === index ? { ...rec, sum: newValue } : rec
+                      i === index ? { ...rec, sum: parseFloat(newValue) } : rec
                     ) as Item[]
                 );
               }}
