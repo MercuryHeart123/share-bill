@@ -1,2 +1,11 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+:root {
+  /* YOUR OTHER STYLES */
+  --ion-safe-area-top: 2.5rem;
+}
+
+:root.ios {
+  /* YOUR OTHER STYLES */
+  --ion-safe-area-bottom: 1rem;
+}

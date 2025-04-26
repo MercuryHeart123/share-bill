@@ -43,10 +43,10 @@ const NameInput = ({
       {isEditingName && (
         <IonButton
           onClick={onClose}
-          color="danger"
+          color="success"
           style={{ marginLeft: "10px" }}
         >
-          Close
+          Save
         </IonButton>
       )}
     </div>

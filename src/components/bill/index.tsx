@@ -1,4 +1,5 @@
 import {
+  IonButton,
   IonCard,
   IonChip,
   IonCol,
@@ -14,9 +15,10 @@ import { useEffect, useState } from "react";
 import { createWorker } from "tesseract.js";
 import { usePhotoGallery } from "../../hook/usePhotoGallery";
 import axios from "axios";
-import { add, camera, pencil } from "ionicons/icons";
+import { add, camera, pencil, trashBin } from "ionicons/icons";
 import { Bill, Item, Person } from "../../pages/Tab2";
 import NameInput from "../input/name";
+import { calculateColor } from "../step/step1";
 
 interface OcrRecord {
   item: string;
@@ -150,8 +152,6 @@ const BillComponent = ({
   }, [name, setBills, index]);
 
   useEffect(() => {
-    console.log("bill on change", bill);
-
     setItems(bill.items);
   }, [bill]);
   return (
@@ -179,36 +179,17 @@ const BillComponent = ({
       </IonToolbar>
       <IonRow>
         <IonCol size="4" sizeMd="4" className="ion-text-center">
-          รายชื่อ
-        </IonCol>
-        <IonCol size="4" sizeMd="4" className="ion-text-center">
           รายการ
         </IonCol>
         <IonCol size="4" sizeMd="4" className="ion-text-center">
           ราคา
         </IonCol>
+        <IonCol size="4" sizeMd="4" className="ion-text-center">
+          รายชื่อ
+        </IonCol>
       </IonRow>
       {items.map((item, index) => (
         <IonRow key={index}>
-          <IonCol size="4" sizeMd="4" className="ion-text-center">
-            {item.persons.map((iPerson, i) => {
-              const person = persons.find((p) => p.id === iPerson);
-              if (!person) return null;
-              return (
-                <IonChip
-                  key={i}
-                  style={{
-                    backgroundColor: person.color,
-                    color: "white",
-                    padding: "5px",
-                    borderRadius: "5px",
-                  }}
-                >
-                  {person.name}
-                </IonChip>
-              );
-            })}
-          </IonCol>
           <IonCol size="4" sizeMd="4" className="ion-text-center">
             <IonInput
               value={item.item}
@@ -246,17 +227,45 @@ const BillComponent = ({
               inputMode="numeric"
             />
           </IonCol>
+          <IonCol size="4" sizeMd="4" className="ion-text-center">
+            {item.persons.length === 0 && (
+              <IonChip color={"danger"}>กรุณาระบุคน</IonChip>
+            )}
+            {item.persons.map((iPerson, i) => {
+              const person = persons.find((p) => p.id === iPerson);
+              if (!person) return null;
+              return (
+                <IonChip
+                  key={i}
+                  style={{
+                    backgroundColor: calculateColor({
+                      color: person.color,
+                      isTextColor: false,
+                    }),
+                    color: calculateColor({
+                      color: person.color,
+                      isTextColor: true,
+                    }),
+                    padding: "5px",
+                    borderRadius: "5px",
+                  }}
+                >
+                  {person.name == "" ? "ยังไม่ได้ระบุชื่อ" : person.name}
+                </IonChip>
+              );
+            })}
+          </IonCol>
         </IonRow>
       ))}
       <IonRow>
         <IonCol
-          size="12"
-          sizeMd="12"
+          size="6"
+          sizeMd="6"
           className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
         >
-          <IonIcon
-            icon={add}
-            size="large"
+          <IonButton
+            expand="full"
+            color={"danger"}
             onClick={() => {
               setItems((prev) => [
                 ...prev,
@@ -267,9 +276,35 @@ const BillComponent = ({
                 },
               ]);
             }}
-          />
+          >
+            <IonIcon icon={trashBin} />
+            ลบรายการ
+          </IonButton>
+        </IonCol>
+        <IonCol
+          size="6"
+          sizeMd="6"
+          className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
+        >
+          <IonButton
+            expand="full"
+            onClick={() => {
+              setItems((prev) => [
+                ...prev,
+                {
+                  item: "",
+                  sum: 0,
+                  persons: [],
+                },
+              ]);
+            }}
+          >
+            <IonIcon icon={add} />
+            เพิ่มรายการ
+          </IonButton>
         </IonCol>
       </IonRow>
+
       <IonFab vertical="bottom" horizontal="end">
         <IonFabButton
           onClick={() => {

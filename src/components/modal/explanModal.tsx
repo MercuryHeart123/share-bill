@@ -36,6 +36,8 @@ const ExplanModal = ({
           );
         });
       });
+      console.log("initialCheckedItems");
+
       return initialCheckedItems;
     }
   );
@@ -53,14 +55,20 @@ const ExplanModal = ({
     const changedKeys = Object.keys(checkedItems).filter(
       (key) => checkedItems[key] !== prev[key]
     );
+    console.log(changedKeys);
 
     if (changedKeys.length > 0) {
+      console.log("changedKeys");
+
       changedKeys.forEach((key) => {
         const [billIndex, itemIndex] = key.split("_").map(Number);
         const deepClonedBills = JSON.parse(JSON.stringify(bills)) as Bill[];
         const dItem = deepClonedBills[billIndex].items[itemIndex];
-        //TO DO: dupe item fix pls
+
         if (checkedItems[key]) {
+          if (dItem.persons.includes(person.id)) {
+            return;
+          }
           dItem.persons.push(person.id);
         } else {
           dItem.persons = dItem.persons.filter(
@@ -74,7 +82,7 @@ const ExplanModal = ({
     }
 
     prevCheckedItemsRef.current = checkedItems;
-  }, [checkedItems, bills, person, setBills]);
+  }, [checkedItems, person, bills, setBills]);
 
   return (
     <>
@@ -108,9 +116,14 @@ const ExplanModal = ({
               {bill.items.map((item, itemIndex) => {
                 const key = `${billIndex}_${itemIndex}`;
                 return (
-                  <IonRow key={itemIndex}>
+                  <IonRow
+                    key={itemIndex}
+                    onClick={() => {
+                      toggleCheckbox(billIndex, itemIndex);
+                    }}
+                  >
                     <IonCol size="3" sizeMd="3" className="ion-text-center">
-                      {item.item}
+                      {item.item == "" ? "ยังไม่มีชื่อรายการ" : item.item}
                     </IonCol>
                     <IonCol size="3" sizeMd="3" className="ion-text-center">
                       {item.sum}
@@ -122,10 +135,7 @@ const ExplanModal = ({
                         : 0}
                     </IonCol>
                     <IonCol size="3" sizeMd="3" className="ion-text-center">
-                      <IonCheckbox
-                        checked={!!checkedItems[key]}
-                        onIonChange={() => toggleCheckbox(billIndex, itemIndex)}
-                      />
+                      <IonCheckbox checked={!!checkedItems[key]} />
                     </IonCol>
                   </IonRow>
                 );
