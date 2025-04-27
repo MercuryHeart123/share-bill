@@ -6,7 +6,10 @@ import {
   IonContent,
   IonGrid,
   IonHeader,
+  IonItem,
   IonRow,
+  IonSelect,
+  IonSelectOption,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -15,6 +18,7 @@ import { useEffect, useRef, useState } from "react";
 
 interface ExplanModalProps {
   person: Person;
+  persons: Person[];
   bills: Bill[];
   setBills: React.Dispatch<React.SetStateAction<Bill[]>>;
   onDismiss: () => void;
@@ -22,6 +26,7 @@ interface ExplanModalProps {
 
 const ExplanModal = ({
   person,
+  persons,
   bills,
   setBills,
   onDismiss,
@@ -36,8 +41,6 @@ const ExplanModal = ({
           );
         });
       });
-      console.log("initialCheckedItems");
-
       return initialCheckedItems;
     }
   );
@@ -55,11 +58,8 @@ const ExplanModal = ({
     const changedKeys = Object.keys(checkedItems).filter(
       (key) => checkedItems[key] !== prev[key]
     );
-    console.log(changedKeys);
 
     if (changedKeys.length > 0) {
-      console.log("changedKeys");
-
       changedKeys.forEach((key) => {
         const [billIndex, itemIndex] = key.split("_").map(Number);
         const deepClonedBills = JSON.parse(JSON.stringify(bills)) as Bill[];
@@ -96,6 +96,29 @@ const ExplanModal = ({
           <IonCard key={billIndex} className="ion-padding">
             <IonToolbar>
               <IonTitle>{bill.name}</IonTitle>
+              <IonItem>
+                <IonSelect
+                  key={billIndex}
+                  value={bill.payer?.id}
+                  label="ใครจ่ายบิลนี้"
+                  labelPlacement="stacked"
+                  onIonChange={(e) => {
+                    const id = e.detail.value;
+                    const deepClonedBills = JSON.parse(
+                      JSON.stringify(bills)
+                    ) as Bill[];
+                    const dBill = deepClonedBills[billIndex];
+                    dBill.payer = persons.find((iPerson) => iPerson.id === id);
+                    setBills(deepClonedBills);
+                  }}
+                >
+                  {persons.map((person, index) => (
+                    <IonSelectOption key={index} value={person.id}>
+                      {person.name}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
             </IonToolbar>
 
             <IonGrid>

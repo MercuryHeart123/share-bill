@@ -22,6 +22,7 @@ export interface Person {
 export interface Bill {
   name: string;
   items: Item[];
+  payer?: Person;
 }
 
 export interface Item {

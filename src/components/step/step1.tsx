@@ -55,6 +55,7 @@ const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
 
   const [present, dismiss] = useIonModal(ExplanModal, {
     person: openPerson,
+    persons: persons,
     bills: bills,
     setBills: setBills,
     onDismiss: handleDismiss,
