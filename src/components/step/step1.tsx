@@ -2,7 +2,6 @@ import {
   IonButton,
   IonCard,
   IonCol,
-  IonContent,
   IonGrid,
   IonIcon,
   IonInput,
@@ -35,34 +34,33 @@ export const calculateColor = ({
 const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
   const [openPerson, setOpenPerson] = useState<Person>();
 
-  const calculateAmountByPerson = (person: Person) => {
-    const sum = bills.reduce((acc, bill) => {
-      const billSum = bill.items.reduce((billAcc, item) => {
-        if (item.persons.some((iPerson) => iPerson === person.id)) {
-          return (
-            billAcc + Math.floor((item.sum / item.persons.length) * 100) / 100
-          );
-        }
-        return billAcc;
-      }, 0);
-      return acc + billSum;
-    }, 0);
-    return sum;
-  };
+  // const calculateAmountByPerson = (person: Person) => {
+  //   const sum = bills.reduce((acc, bill) => {
+  //     const billSum = bill.items.reduce((billAcc, item) => {
+  //       if (item.persons.some((iPerson) => iPerson === person.id)) {
+  //         return (
+  //           billAcc + Math.floor((item.sum / item.persons.length) * 100) / 100
+  //         );
+  //       }
+  //       return billAcc;
+  //     }, 0);
+  //     return acc + billSum;
+  //   }, 0);
+  //   return sum;
+  // };
   const handleDismiss = () => {
     dismiss();
   };
 
   const [present, dismiss] = useIonModal(ExplanModal, {
     person: openPerson,
-    persons: persons,
     bills: bills,
     setBills: setBills,
     onDismiss: handleDismiss,
   });
 
   return (
-    <IonContent fullscreen={true}>
+    <>
       <IonCard>
         <h2 style={{ margin: "1rem" }}>รายการบิลทั้งหมด</h2>
       </IonCard>
@@ -105,19 +103,19 @@ const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
       <IonCard>
         <IonGrid>
           <IonRow>
-            <IonCol size="4" sizeMd="4" className="ion-text-center">
+            <IonCol size="6" sizeMd="6" className="ion-text-center">
               ชื่อ
             </IonCol>
-            <IonCol size="4" sizeMd="4" className="ion-text-center">
+            {/* <IonCol size="6" sizeMd="6" className="ion-text-center" style={{}}>
               เงินที่ต้องจ่าย
-            </IonCol>
-            <IonCol size="4" sizeMd="4" className="ion-text-center">
+            </IonCol> */}
+            <IonCol size="6" sizeMd="6" className="ion-text-center">
               แอคชัน
             </IonCol>
           </IonRow>
           {persons.map((item, index) => (
             <IonRow key={index}>
-              <IonCol size="4" sizeMd="4" className="ion-text-center">
+              <IonCol size="6" sizeMd="6" className="ion-text-center">
                 <IonInput
                   value={item.name}
                   type="text"
@@ -145,10 +143,10 @@ const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
                   className="ion-text-center"
                 />
               </IonCol>
-              <IonCol size="4" sizeMd="4" className="ion-text-center">
+              {/* <IonCol size="6" sizeMd="6" className="ion-text-center">
                 {calculateAmountByPerson(item)}
-              </IonCol>
-              <IonCol size="4" sizeMd="4" className="ion-text-center">
+              </IonCol> */}
+              <IonCol size="6" sizeMd="6" className="ion-text-center">
                 <IonButton
                   color="danger"
                   onClick={() => {
@@ -200,7 +198,7 @@ const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
           </IonRow>
         </IonGrid>
       </IonCard>
-    </IonContent>
+    </>
   );
 };
 

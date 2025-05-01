@@ -11,6 +11,8 @@ import {
 } from "@ionic/react";
 import { useState } from "react";
 import Step1 from "../components/step/step1";
+import Step2 from "../components/step/step2";
+import Step3 from "../components/step/step3";
 
 export interface Person {
   id: string;
@@ -31,11 +33,7 @@ export interface Item {
   persons: string[];
 }
 
-export interface Record {
-  items: Item[];
-  name: string;
-}
-const Tab2: React.FC = () => {
+const StandAlone: React.FC = () => {
   const [step, setStep] = useState(1); // 🆕 Step control
   const [persons, setPersons] = useState<Person[]>([
     {
@@ -60,7 +58,7 @@ const Tab2: React.FC = () => {
     },
   ]);
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, 4)); // let's assume max 3 steps
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, 3)); // let's assume max 3 steps
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const sizeOfCol = step === 1 ? "12" : step === 2 ? "6" : "12";
@@ -69,8 +67,7 @@ const Tab2: React.FC = () => {
       <IonHeader translucent={true}>
         <IonToolbar>
           <IonTitle>มาหารกัน</IonTitle>
-          {/* 🆕 Step Progress */}
-          <IonProgressBar value={step / 4} />
+          <IonProgressBar value={step / 3} />
         </IonToolbar>
       </IonHeader>
 
@@ -85,18 +82,10 @@ const Tab2: React.FC = () => {
         )}
 
         {step === 2 && (
-          <>
-            <h2>สรุปรายการ</h2>
-            {/* Example: show a summary, total amount, etc. */}
-          </>
+          <Step2 persons={persons} bills={bills} setBills={setBills} />
         )}
 
-        {step === 3 && (
-          <>
-            <h2>เสร็จสิ้น</h2>
-            {/* Example: Confirmation page */}
-          </>
-        )}
+        {step === 3 && <Step3 persons={persons} bills={bills} />}
 
         {/* Next Button */}
         <IonRow className="ion-padding">
@@ -107,15 +96,17 @@ const Tab2: React.FC = () => {
               </IonButton>
             )}
           </IonCol>
-          <IonCol size={sizeOfCol}>
-            <IonButton expand="full" onClick={nextStep}>
-              {step < 3 ? "ถัดไป" : "เสร็จสิ้น"}
-            </IonButton>
-          </IonCol>
+          {step < 3 && (
+            <IonCol size={sizeOfCol}>
+              <IonButton expand="full" onClick={nextStep}>
+                ถัดไป
+              </IonButton>
+            </IonCol>
+          )}
         </IonRow>
       </IonContent>
     </IonPage>
   );
 };
 
-export default Tab2;
+export default StandAlone;

@@ -6,10 +6,7 @@ import {
   IonContent,
   IonGrid,
   IonHeader,
-  IonItem,
   IonRow,
-  IonSelect,
-  IonSelectOption,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
@@ -26,7 +23,6 @@ interface ExplanModalProps {
 
 const ExplanModal = ({
   person,
-  persons,
   bills,
   setBills,
   onDismiss,
@@ -96,29 +92,6 @@ const ExplanModal = ({
           <IonCard key={billIndex} className="ion-padding">
             <IonToolbar>
               <IonTitle>{bill.name}</IonTitle>
-              <IonItem>
-                <IonSelect
-                  key={billIndex}
-                  value={bill.payer?.id}
-                  label="ใครจ่ายบิลนี้"
-                  labelPlacement="stacked"
-                  onIonChange={(e) => {
-                    const id = e.detail.value;
-                    const deepClonedBills = JSON.parse(
-                      JSON.stringify(bills)
-                    ) as Bill[];
-                    const dBill = deepClonedBills[billIndex];
-                    dBill.payer = persons.find((iPerson) => iPerson.id === id);
-                    setBills(deepClonedBills);
-                  }}
-                >
-                  {persons.map((person, index) => (
-                    <IonSelectOption key={index} value={person.id}>
-                      {person.name}
-                    </IonSelectOption>
-                  ))}
-                </IonSelect>
-              </IonItem>
             </IonToolbar>
 
             <IonGrid>
