@@ -54,13 +54,7 @@ const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
               ...prev,
               {
                 name: `บิล ${prev.length + 1}`,
-                items: [
-                  {
-                    item: "",
-                    sum: 0,
-                    persons: [],
-                  },
-                ],
+                items: [],
               },
             ]);
           }}

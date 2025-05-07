@@ -14,10 +14,9 @@ import {
   IonLabel,
   IonModal,
   IonRow,
-  IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   add,
   pencil,
@@ -25,6 +24,7 @@ import {
   alertCircleOutline,
   checkmark,
   personAdd,
+  restaurant,
 } from "ionicons/icons";
 import { Bill, Item, Person } from "../../pages/Tab2";
 import { calculateColor } from "../step/step1";
@@ -53,8 +53,6 @@ const BillComponent = ({
   const [currentEdit, setCurrentEditItem] = useState<Item | null>(null);
   const [addingItemName, setAddingItemName] = useState("");
   const [addPersonName, setAddPersonName] = useState("");
-  const itemModalRef = useRef<HTMLIonModalElement>(null);
-  const billModalRef = useRef<HTMLIonModalElement>(null);
 
   const openItemModal = (index: number) => {
     setEditingItemIndex(index);
@@ -96,56 +94,90 @@ const BillComponent = ({
     Keyboard.setScroll({ isDisabled: false }); // Allow automatic scroll
   }, []);
 
-  useMemo(() => {
-    openItemModal(items.length === 0 ? 0 : items.length - 1);
-  }, [items.length]);
-
   const deleteBill = () => {
     // Remove the bill by filtering out the current one using the `index`
     setBills((prev) => prev.filter((_, i) => i !== index));
   };
 
-  useEffect(() => {
-    const k = async () => {
-      const showSub = await Keyboard.addListener("keyboardWillShow", () => {
-        if (itemModalOpen) itemModalRef.current?.setCurrentBreakpoint(0.8);
-        if (billModalOpen) billModalRef.current?.setCurrentBreakpoint(0.8);
-      });
-      const hideSub = await Keyboard.addListener("keyboardWillHide", () => {
-        if (itemModalOpen) itemModalRef.current?.setCurrentBreakpoint(0.5);
-        if (billModalOpen) billModalRef.current?.setCurrentBreakpoint(0.5);
-      });
-      return () => {
-        showSub.remove();
-        hideSub.remove();
-      };
-    };
-
-    k();
-    return () => {
-      Keyboard.removeAllListeners();
-    };
-  }, [billModalOpen, itemModalOpen]);
-
   return (
     <IonCard className="ion-padding">
       <IonToolbar>
-        <IonTitle onClick={openBillModal}>
-          {name} <IonIcon icon={pencil} />
-        </IonTitle>
+        <div
+          onClick={openBillModal}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            cursor: "pointer",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              fontSize: "20px",
+              alignItems: "center",
+            }}
+          >
+            {name}{" "}
+            <IonIcon
+              style={{
+                marginLeft: "10px",
+              }}
+              icon={pencil}
+            />
+          </div>
+          {bill.payer && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              ผู้จ่ายบิลนี้:
+              <IonChip
+                style={{
+                  color: calculateColor({
+                    color: bill.payer.color || "0, 0, 0",
+                    isTextColor: true,
+                  }),
+                  backgroundColor: calculateColor({
+                    color: bill.payer.color || "0, 0, 0",
+                    isTextColor: false,
+                  }),
+                  borderRadius: "5px",
+                }}
+              >
+                <IonIcon
+                  icon={restaurant}
+                  style={{
+                    margin: "0px",
+
+                    color: calculateColor({
+                      color: bill.payer.color || "0, 0, 0",
+                      isTextColor: true,
+                    }),
+                  }}
+                />
+
+                {bill.payer.name || "ยังไม่ได้ระบุชื่อ"}
+              </IonChip>
+            </div>
+          )}
+        </div>
       </IonToolbar>
       <IonGrid>
-        <IonRow>
-          <IonCol size="4" className="ion-text-center">
-            รายการ
-          </IonCol>
-          <IonCol size="4" className="ion-text-center">
-            ราคา
-          </IonCol>
-          <IonCol size="4" className="ion-text-center">
-            รายชื่อ
-          </IonCol>
-        </IonRow>
+        {items.length > 0 && (
+          <IonRow>
+            <IonCol size="4" className="ion-text-center">
+              รายการ
+            </IonCol>
+            <IonCol size="4" className="ion-text-center">
+              ราคา
+            </IonCol>
+            <IonCol size="4" className="ion-text-center">
+              รายชื่อ
+            </IonCol>
+          </IonRow>
+        )}
 
         {items.map((item, iIndex) => (
           <IonItemSliding key={crypto.randomUUID()}>
@@ -256,6 +288,13 @@ const BillComponent = ({
                 },
               ]);
               setAddingItemName("");
+              setItemModalOpen(true);
+              setEditingItemIndex(items.length);
+              setCurrentEditItem({
+                item: addingItemName,
+                sum: 0,
+                persons: [],
+              });
             }}
           >
             <IonIcon icon={add} />
@@ -266,9 +305,6 @@ const BillComponent = ({
       <IonModal
         isOpen={itemModalOpen}
         onDidDismiss={() => setItemModalOpen(false)}
-        breakpoints={[0, 0.5, 0.8]}
-        initialBreakpoint={0.5}
-        ref={itemModalRef}
       >
         <IonContent
           className="ion-padding"
@@ -335,13 +371,16 @@ const BillComponent = ({
                 }}
               />
             </IonItem>
+            <IonItem lines="none" style={{ padding: "0px" }}>
+              คนที่หาร
+            </IonItem>
             <IonItem lines="full">
-              <IonLabel position="stacked">คนที่หาร</IonLabel>
               <div
                 style={{
                   display: "flex",
                   flexWrap: "wrap", // Allow chips to wrap to the next line
                   gap: "2px", // Optional: adds space between the chips
+                  paddingBottom: "20px",
                 }}
               >
                 {persons.map((person) => {
@@ -503,9 +542,6 @@ const BillComponent = ({
       <IonModal
         isOpen={billModalOpen}
         onDidDismiss={() => setBillModalOpen(false)}
-        breakpoints={[0, 0.5, 0.8]}
-        initialBreakpoint={0.5}
-        ref={billModalRef}
       >
         <IonContent className="ion-padding">
           <IonCard className="ion-padding" style={{ borderRadius: "20px" }}>
@@ -522,6 +558,79 @@ const BillComponent = ({
                   setName(e.detail.value || "");
                 }}
               />
+            </IonItem>
+            <IonItem lines="none" style={{ padding: "0px" }}>
+              ใครจ่ายบิลนี้
+            </IonItem>
+            <IonItem lines="full">
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap", // Allow chips to wrap to the next line
+                  gap: "2px", // Optional: adds space between the chips
+                  paddingBottom: "20px",
+                }}
+              >
+                {persons.map((person) => {
+                  const isPersonIsPayer = bill.payer?.id === person.id;
+                  return (
+                    <IonChip
+                      key={person.id}
+                      style={{
+                        ...(isPersonIsPayer
+                          ? {
+                              color: calculateColor({
+                                color: person.color,
+                                isTextColor: true,
+                              }),
+                              backgroundColor: calculateColor({
+                                color: person.color,
+                                isTextColor: false,
+                              }),
+                            }
+                          : {}),
+                        borderRadius: "5px",
+                      }}
+                      onClick={() => {
+                        setBills((prev) =>
+                          prev.map((rec, i) => {
+                            if (i !== index) return rec;
+                            return {
+                              ...rec,
+                              payer: person,
+                            };
+                          })
+                        );
+                      }}
+                    >
+                      {isPersonIsPayer ? (
+                        <IonIcon
+                          icon={restaurant}
+                          style={{
+                            margin: "0px",
+                            ...(isPersonIsPayer
+                              ? {
+                                  color: calculateColor({
+                                    color: person.color,
+                                    isTextColor: true,
+                                  }),
+                                }
+                              : {}),
+                          }}
+                        />
+                      ) : (
+                        <IonIcon
+                          icon={add}
+                          style={{
+                            margin: "0px",
+                          }}
+                        />
+                      )}
+                      {person.name || "ยังไม่ได้ระบุชื่อ"}
+                    </IonChip>
+                  );
+                })}
+              </div>
             </IonItem>
 
             <IonRow style={{ marginTop: "1.5rem" }}>
