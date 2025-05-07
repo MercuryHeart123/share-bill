@@ -35,28 +35,8 @@ export interface Item {
 
 const StandAlone: React.FC = () => {
   const [step, setStep] = useState(1); // 🆕 Step control
-  const [persons, setPersons] = useState<Person[]>([
-    {
-      id: crypto.randomUUID(),
-      name: "",
-      color: `${Math.floor(Math.random() * 255)}, ${Math.floor(
-        Math.random() * 255
-      )}, ${Math.floor(Math.random() * 255)}`,
-      amount: 0,
-    },
-  ]);
-  const [bills, setBills] = useState<Bill[]>([
-    {
-      name: "บิล 1",
-      items: [
-        {
-          item: "",
-          sum: 0,
-          persons: [],
-        },
-      ],
-    },
-  ]);
+  const [persons, setPersons] = useState<Person[]>([]);
+  const [bills, setBills] = useState<Bill[]>([]);
 
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 3)); // let's assume max 3 steps
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));

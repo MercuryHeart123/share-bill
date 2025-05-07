@@ -17,14 +17,22 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { useEffect, useRef, useState } from "react";
-import { add, pencil, trashBin, alertCircleOutline } from "ionicons/icons";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  add,
+  pencil,
+  trashBin,
+  alertCircleOutline,
+  checkmark,
+  personAdd,
+} from "ionicons/icons";
 import { Bill, Item, Person } from "../../pages/Tab2";
 import { calculateColor } from "../step/step1";
 import { Keyboard } from "@capacitor/keyboard";
 
 interface BillComponentProps {
   persons: Person[];
+  setPersons: React.Dispatch<React.SetStateAction<Person[]>>;
   index: number;
   bill: Bill;
   setBills: React.Dispatch<React.SetStateAction<Bill[]>>;
@@ -32,6 +40,7 @@ interface BillComponentProps {
 
 const BillComponent = ({
   persons,
+  setPersons,
   index,
   bill,
   setBills,
@@ -42,6 +51,8 @@ const BillComponent = ({
   const [itemModalOpen, setItemModalOpen] = useState(false);
   const [editingIndex, setEditingItemIndex] = useState<number | null>(null);
   const [currentEdit, setCurrentEditItem] = useState<Item | null>(null);
+  const [addingItemName, setAddingItemName] = useState("");
+  const [addPersonName, setAddPersonName] = useState("");
   const itemModalRef = useRef<HTMLIonModalElement>(null);
   const billModalRef = useRef<HTMLIonModalElement>(null);
 
@@ -84,6 +95,10 @@ const BillComponent = ({
   useEffect(() => {
     Keyboard.setScroll({ isDisabled: false }); // Allow automatic scroll
   }, []);
+
+  useMemo(() => {
+    openItemModal(items.length === 0 ? 0 : items.length - 1);
+  }, [items.length]);
 
   const deleteBill = () => {
     // Remove the bill by filtering out the current one using the `index`
@@ -210,8 +225,23 @@ const BillComponent = ({
 
       <IonRow>
         <IonCol
-          size="12"
-          sizeMd="12"
+          size="9"
+          sizeMd="9"
+          className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
+        >
+          <IonInput
+            value={addingItemName}
+            placeholder="ใส่ชื่อรายการ"
+            onIonInput={(e) => {
+              const newValue = e.detail.value;
+              if (!newValue) return;
+              setAddingItemName(newValue);
+            }}
+          />
+        </IonCol>
+        <IonCol
+          size="3"
+          sizeMd="3"
           className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
         >
           <IonButton
@@ -220,11 +250,12 @@ const BillComponent = ({
               setItems((prev) => [
                 ...prev,
                 {
-                  item: "",
+                  item: addingItemName,
                   sum: 0,
                   persons: [],
                 },
               ]);
+              setAddingItemName("");
             }}
           >
             <IonIcon icon={add} />
@@ -255,7 +286,7 @@ const BillComponent = ({
               <IonInput
                 placeholder="ใส่ชื่อรายการ"
                 value={currentEdit?.item}
-                onIonChange={(e) => {
+                onIonInput={(e) => {
                   setCurrentEditItem((prev) =>
                     prev
                       ? {
@@ -284,7 +315,7 @@ const BillComponent = ({
                         maximumFractionDigits: 2,
                       })
                 }
-                onIonChange={(e) => {
+                onIonInput={(e) => {
                   const input = e.detail.value || "0";
                   // Remove commas and limit to two decimal places
                   const rawValue = input.replace(/,/g, "");
@@ -304,6 +335,128 @@ const BillComponent = ({
                 }}
               />
             </IonItem>
+            <IonItem lines="full">
+              <IonLabel position="stacked">คนที่หาร</IonLabel>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap", // Allow chips to wrap to the next line
+                  gap: "2px", // Optional: adds space between the chips
+                }}
+              >
+                {persons.map((person) => {
+                  const isPersonInList = currentEdit?.persons.includes(
+                    person.id
+                  );
+                  return (
+                    <IonChip
+                      key={person.id}
+                      style={{
+                        ...(isPersonInList
+                          ? {
+                              color: calculateColor({
+                                color: person.color,
+                                isTextColor: true,
+                              }),
+                              backgroundColor: calculateColor({
+                                color: person.color,
+                                isTextColor: false,
+                              }),
+                            }
+                          : {}),
+                        borderRadius: "5px",
+                      }}
+                      onClick={() => {
+                        if (!currentEdit) return;
+                        setCurrentEditItem((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                persons: prev.persons.includes(person.id)
+                                  ? prev.persons.filter(
+                                      (id) => id !== person.id
+                                    )
+                                  : [...prev.persons, person.id],
+                              }
+                            : null
+                        );
+                      }}
+                    >
+                      {isPersonInList ? (
+                        <IonIcon
+                          icon={checkmark}
+                          style={{
+                            margin: "0px",
+                            ...(isPersonInList
+                              ? {
+                                  color: calculateColor({
+                                    color: person.color,
+                                    isTextColor: true,
+                                  }),
+                                }
+                              : {}),
+                          }}
+                        />
+                      ) : (
+                        <IonIcon
+                          icon={add}
+                          style={{
+                            margin: "0px",
+                          }}
+                        />
+                      )}
+                      {person.name || "ยังไม่ได้ระบุชื่อ"}
+                    </IonChip>
+                  );
+                })}
+              </div>
+            </IonItem>
+            <IonRow>
+              <IonCol
+                size="9"
+                sizeMd="9"
+                className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
+              >
+                <IonInput
+                  value={addPersonName}
+                  type="text"
+                  inputMode="text"
+                  placeholder="ชื่อ"
+                  onIonInput={(e) => {
+                    const newValue = e.detail.value;
+                    if (!newValue) return;
+                    setAddPersonName(newValue);
+                  }}
+                  className="ion-text-center"
+                />
+              </IonCol>
+              <IonCol
+                size="3"
+                sizeMd="3"
+                className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
+              >
+                <IonButton
+                  expand="full"
+                  className="ion-text-center"
+                  onClick={() => {
+                    setPersons((prev) => [
+                      ...prev,
+                      {
+                        id: crypto.randomUUID(),
+                        name: addPersonName,
+                        amount: 0,
+                        color: `${Math.floor(55 + Math.random() * 200)}, ${
+                          55 + Math.floor(55 + Math.random() * 200)
+                        }, ${Math.floor(Math.random() * 200)}`,
+                      },
+                    ]);
+                    setAddPersonName("");
+                  }}
+                >
+                  <IonIcon icon={personAdd} />
+                </IonButton>
+              </IonCol>
+            </IonRow>
             <IonRow style={{ marginTop: "1.5rem" }}>
               <IonCol
                 size="6"
@@ -365,7 +518,7 @@ const BillComponent = ({
               <IonInput
                 placeholder="ใส่ชื่อบิล"
                 value={name}
-                onIonChange={(e) => {
+                onIonInput={(e) => {
                   setName(e.detail.value || "");
                 }}
               />

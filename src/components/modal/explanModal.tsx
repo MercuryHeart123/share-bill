@@ -15,7 +15,6 @@ import { useEffect, useRef, useState } from "react";
 
 interface ExplanModalProps {
   person: Person;
-  persons: Person[];
   bills: Bill[];
   setBills: React.Dispatch<React.SetStateAction<Bill[]>>;
   onDismiss: () => void;

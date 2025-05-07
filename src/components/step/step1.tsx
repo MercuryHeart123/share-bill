@@ -4,15 +4,13 @@ import {
   IonCol,
   IonGrid,
   IonIcon,
-  IonInput,
   IonRow,
-  useIonModal,
 } from "@ionic/react";
-import React, { useState } from "react";
+import React from "react";
 import BillComponent from "../bill";
 import { Bill, Person } from "../../pages/Tab2";
-import ExplanModal from "../modal/explanModal";
-import { add, personAdd, fastFood, trashBin } from "ionicons/icons";
+import { add } from "ionicons/icons";
+import Persons from "../bill/persons";
 
 interface Step1Props {
   persons: Person[];
@@ -32,33 +30,6 @@ export const calculateColor = ({
   return rgbaColor;
 };
 const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
-  const [openPerson, setOpenPerson] = useState<Person>();
-
-  // const calculateAmountByPerson = (person: Person) => {
-  //   const sum = bills.reduce((acc, bill) => {
-  //     const billSum = bill.items.reduce((billAcc, item) => {
-  //       if (item.persons.some((iPerson) => iPerson === person.id)) {
-  //         return (
-  //           billAcc + Math.floor((item.sum / item.persons.length) * 100) / 100
-  //         );
-  //       }
-  //       return billAcc;
-  //     }, 0);
-  //     return acc + billSum;
-  //   }, 0);
-  //   return sum;
-  // };
-  const handleDismiss = () => {
-    dismiss();
-  };
-
-  const [present, dismiss] = useIonModal(ExplanModal, {
-    person: openPerson,
-    bills: bills,
-    setBills: setBills,
-    onDismiss: handleDismiss,
-  });
-
   return (
     <>
       <IonCard>
@@ -67,6 +38,7 @@ const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
       {bills.map((item, index) => (
         <BillComponent
           persons={persons}
+          setPersons={setPersons}
           index={index}
           key={index}
           bill={item}
@@ -103,99 +75,19 @@ const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
       <IonCard>
         <IonGrid>
           <IonRow>
-            <IonCol size="6" sizeMd="6" className="ion-text-center">
+            <IonCol size="12" sizeMd="12" className="ion-text-center">
               ชื่อ
             </IonCol>
             {/* <IonCol size="6" sizeMd="6" className="ion-text-center" style={{}}>
               เงินที่ต้องจ่าย
             </IonCol> */}
-            <IonCol size="6" sizeMd="6" className="ion-text-center">
-              แอคชัน
-            </IonCol>
           </IonRow>
-          {persons.map((item, index) => (
-            <IonRow key={index}>
-              <IonCol size="6" sizeMd="6" className="ion-text-center">
-                <IonInput
-                  value={item.name}
-                  type="text"
-                  inputMode="text"
-                  placeholder="ชื่อ"
-                  style={{
-                    backgroundColor: calculateColor({
-                      color: item.color,
-                      isTextColor: false,
-                    }),
-                    color: calculateColor({
-                      color: item.color,
-                      isTextColor: true,
-                    }),
-                  }}
-                  onIonChange={(e) => {
-                    const newValue = e.detail.value;
-                    if (!newValue) return;
-                    setPersons((prev) =>
-                      prev.map((rec, i) =>
-                        i === index ? { ...rec, name: newValue } : rec
-                      )
-                    );
-                  }}
-                  className="ion-text-center"
-                />
-              </IonCol>
-              {/* <IonCol size="6" sizeMd="6" className="ion-text-center">
-                {calculateAmountByPerson(item)}
-              </IonCol> */}
-              <IonCol size="6" sizeMd="6" className="ion-text-center">
-                <IonButton
-                  color="danger"
-                  onClick={() => {
-                    setPersons((prev) => prev.filter((_, i) => i != index));
-                  }}
-                >
-                  <IonIcon icon={trashBin} />
-                </IonButton>
-
-                <IonButton
-                  color={"secondary"}
-                  onClick={() => {
-                    setOpenPerson(item);
-                    present();
-                  }}
-                >
-                  <IonIcon icon={fastFood} />
-                </IonButton>
-              </IonCol>
-            </IonRow>
-          ))}
-          <IonRow>
-            <IonCol
-              size="12"
-              sizeMd="12"
-              className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
-            >
-              <IonButton
-                expand="full"
-                className="ion-text-center"
-                onClick={() => {
-                  setPersons((prev) => [
-                    ...prev,
-                    {
-                      id: crypto.randomUUID(),
-                      name: "",
-                      amount: 0,
-                      color: `${Math.floor(Math.random() * 255)}, ${Math.floor(
-                        Math.random() * 255
-                      )}, ${Math.floor(Math.random() * 255)}`,
-                    },
-                  ]);
-                }}
-              >
-                <IonIcon icon={personAdd} />
-                เพิ่มบุคคลเป็นหนี้
-              </IonButton>
-            </IonCol>
-          </IonRow>
+          <Persons
+            persons={persons}
+            setPersons={setPersons}
+            bills={bills}
+            setBills={setBills}
+          />
         </IonGrid>
       </IonCard>
     </>

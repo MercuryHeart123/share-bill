@@ -72,7 +72,7 @@ const Step2 = ({ persons, bills, setBills }: Step2Props) => {
               value={bill.payer?.id}
               label="ใครจ่ายบิลนี้"
               labelPlacement="stacked"
-              onIonChange={(e) => {
+              onIonInput={(e) => {
                 const id = e.detail.value;
                 const deepClonedBills = JSON.parse(
                   JSON.stringify(bills)

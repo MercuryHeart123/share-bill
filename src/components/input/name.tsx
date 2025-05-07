@@ -33,7 +33,7 @@ const NameInput = ({
         type="text"
         inputMode="text"
         placeholder="ชื่อบิล"
-        onIonChange={(e) => {
+        onIonInput={(e) => {
           const newValue = e.detail.value;
           if (newValue) setName(newValue);
         }}
