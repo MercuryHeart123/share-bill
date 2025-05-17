@@ -16,7 +16,7 @@ import {
   IonRow,
   IonToolbar,
 } from "@ionic/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   add,
   pencil,
@@ -54,6 +54,7 @@ const BillComponent = ({
   const [addingItemName, setAddingItemName] = useState("");
   const [addPersonName, setAddPersonName] = useState("");
 
+  const modalCardRef = useRef<HTMLIonCardElement>(null);
   const openItemModal = (index: number) => {
     setEditingItemIndex(index);
     setCurrentEditItem(items[index]);
@@ -305,6 +306,8 @@ const BillComponent = ({
       <IonModal
         isOpen={itemModalOpen}
         onDidDismiss={() => setItemModalOpen(false)}
+        breakpoints={[0.8]} // Set the breakpoints for the modal
+        initialBreakpoint={0.8} // Set the initial breakpoint
       >
         <IonContent
           className="ion-padding"
@@ -312,7 +315,15 @@ const BillComponent = ({
           fullscreen={true}
           scrollY={true}
         >
-          <IonCard className="ion-padding" style={{ borderRadius: "20px" }}>
+          <IonCard
+            className="ion-padding"
+            ref={modalCardRef}
+            style={{
+              borderRadius: "20px",
+              maxHeight: "50vh", // limit height to 70% of the viewport height
+              overflowY: "auto", // allow internal scrolling
+            }}
+          >
             <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
               แก้ไขรายการ
             </h2>
@@ -496,47 +507,47 @@ const BillComponent = ({
                 </IonButton>
               </IonCol>
             </IonRow>
-            <IonRow style={{ marginTop: "1.5rem" }}>
-              <IonCol
-                size="6"
-                sizeMd="6"
-                className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
-              >
-                {" "}
-                <IonButton
-                  expand="block"
-                  color={"danger"}
-                  onClick={() => {
-                    setItems((prev) =>
-                      prev.filter((_, idx) => idx !== editingIndex)
-                    );
-                    setItemModalOpen(false);
-                  }}
-                >
-                  ลบรายการ
-                </IonButton>
-              </IonCol>
-              <IonCol
-                size="6"
-                sizeMd="6"
-                className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
-              >
-                <IonButton
-                  expand="block"
-                  onClick={() => {
-                    setItems((prev) =>
-                      prev.map((it, i) =>
-                        i === editingIndex ? currentEdit! : it
-                      )
-                    );
-                    setItemModalOpen(false);
-                  }}
-                >
-                  บันทึก
-                </IonButton>
-              </IonCol>
-            </IonRow>
           </IonCard>
+          <IonRow style={{ marginTop: "1.5rem" }}>
+            <IonCol
+              size="6"
+              sizeMd="6"
+              className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
+            >
+              {" "}
+              <IonButton
+                expand="block"
+                color={"danger"}
+                onClick={() => {
+                  setItems((prev) =>
+                    prev.filter((_, idx) => idx !== editingIndex)
+                  );
+                  setItemModalOpen(false);
+                }}
+              >
+                ลบรายการ
+              </IonButton>
+            </IonCol>
+            <IonCol
+              size="6"
+              sizeMd="6"
+              className="ion-text-center ion-align-self-center ion-justify-content-center d-flex"
+            >
+              <IonButton
+                expand="block"
+                onClick={() => {
+                  setItems((prev) =>
+                    prev.map((it, i) =>
+                      i === editingIndex ? currentEdit! : it
+                    )
+                  );
+                  setItemModalOpen(false);
+                }}
+              >
+                บันทึก
+              </IonButton>
+            </IonCol>
+          </IonRow>
         </IonContent>
       </IonModal>
       <IonModal

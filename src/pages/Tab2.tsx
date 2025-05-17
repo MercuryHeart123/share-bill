@@ -59,7 +59,14 @@ const StandAlone: React.FC = () => {
           />
         )}
 
-        {step === 2 && <Step3 persons={persons} bills={bills} />}
+        {step === 2 && (
+          <Step3
+            persons={persons}
+            bills={bills}
+            setBills={setBills}
+            setPersons={setPersons}
+          />
+        )}
 
         {/* Next Button */}
         <IonRow className="ion-padding">

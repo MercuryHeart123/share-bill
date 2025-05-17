@@ -1,16 +1,8 @@
-import {
-  IonButton,
-  IonCard,
-  IonCol,
-  IonGrid,
-  IonIcon,
-  IonRow,
-} from "@ionic/react";
+import { IonButton, IonCard, IonIcon } from "@ionic/react";
 import React from "react";
 import BillComponent from "../bill";
 import { Bill, Person } from "../../pages/Tab2";
 import { add } from "ionicons/icons";
-import Persons from "../bill/persons";
 
 interface Step1Props {
   persons: Person[];
@@ -62,27 +54,6 @@ const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
           <IonIcon icon={add} />
           เพิ่มบิล
         </IonButton>
-      </IonCard>
-      <IonCard>
-        <h2 style={{ margin: "1rem" }}>รายชื่อทั้งหมด</h2>
-      </IonCard>
-      <IonCard>
-        <IonGrid>
-          <IonRow>
-            <IonCol size="12" sizeMd="12" className="ion-text-center">
-              ชื่อ
-            </IonCol>
-            {/* <IonCol size="6" sizeMd="6" className="ion-text-center" style={{}}>
-              เงินที่ต้องจ่าย
-            </IonCol> */}
-          </IonRow>
-          <Persons
-            persons={persons}
-            setPersons={setPersons}
-            bills={bills}
-            setBills={setBills}
-          />
-        </IonGrid>
       </IonCard>
     </>
   );
