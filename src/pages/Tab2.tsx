@@ -8,10 +8,12 @@ import {
   IonButton,
   IonRow,
   IonCol,
+  IonIcon,
 } from "@ionic/react";
 import { useState } from "react";
 import Step1 from "../components/step/step1";
-import Step3 from "../components/step/step3";
+import Step2 from "../components/step/step2";
+import { receiptOutline } from "ionicons/icons";
 
 export interface Person {
   id: string;
@@ -35,7 +37,12 @@ export interface Item {
 const StandAlone: React.FC = () => {
   const [step, setStep] = useState(1); // 🆕 Step control
   const [persons, setPersons] = useState<Person[]>([]);
-  const [bills, setBills] = useState<Bill[]>([]);
+  const [bills, setBills] = useState<Bill[]>([
+    {
+      name: "บิล 1",
+      items: [],
+    },
+  ]);
 
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 2)); // let's assume max 3 steps
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
@@ -56,11 +63,32 @@ const StandAlone: React.FC = () => {
             setPersons={setPersons}
             bills={bills}
             setBills={setBills}
-          />
+          >
+            <IonButton
+              expand="block"
+              className="ion-text-center"
+              style={{
+                margin: "10px",
+              }}
+              onClick={nextStep}
+              color={"success"}
+            >
+              <div
+                style={{
+                  gap: "5px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <IonIcon icon={receiptOutline} />
+                สรุปค่าใช้จ่าย
+              </div>
+            </IonButton>
+          </Step1>
         )}
 
         {step === 2 && (
-          <Step3
+          <Step2
             persons={persons}
             bills={bills}
             setBills={setBills}
@@ -77,13 +105,6 @@ const StandAlone: React.FC = () => {
               </IonButton>
             )}
           </IonCol>
-          {step < 2 && (
-            <IonCol size={"12"}>
-              <IonButton expand="full" onClick={nextStep}>
-                สรุปค่าใช้จ่าย
-              </IonButton>
-            </IonCol>
-          )}
         </IonRow>
       </IonContent>
     </IonPage>

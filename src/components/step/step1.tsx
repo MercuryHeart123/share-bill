@@ -9,6 +9,7 @@ interface Step1Props {
   setPersons: React.Dispatch<React.SetStateAction<Person[]>>;
   bills: Bill[];
   setBills: React.Dispatch<React.SetStateAction<Bill[]>>;
+  children?: React.ReactNode; // ✅ add this line to receive children
 }
 export const calculateColor = ({
   color,
@@ -21,11 +22,23 @@ export const calculateColor = ({
 
   return rgbaColor;
 };
-const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
+const Step1 = ({
+  persons,
+  setPersons,
+  bills,
+  setBills,
+  children,
+}: Step1Props) => {
   return (
     <>
-      <IonCard>
+      <IonCard
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <h2 style={{ margin: "1rem" }}>รายการบิลทั้งหมด</h2>
+        {children}
       </IonCard>
       {bills.map((item, index) => (
         <BillComponent
@@ -37,24 +50,25 @@ const Step1 = ({ persons, setPersons, bills, setBills }: Step1Props) => {
           setBills={setBills}
         />
       ))}
-      <IonCard>
-        <IonButton
-          expand="full"
-          className="ion-text-center"
-          onClick={() => {
-            setBills((prev) => [
-              ...prev,
-              {
-                name: `บิล ${prev.length + 1}`,
-                items: [],
-              },
-            ]);
-          }}
-        >
-          <IonIcon icon={add} />
-          เพิ่มบิล
-        </IonButton>
-      </IonCard>
+      <IonButton
+        expand="block"
+        className="ion-text-center"
+        style={{
+          margin: "10px",
+        }}
+        onClick={() => {
+          setBills((prev) => [
+            ...prev,
+            {
+              name: `บิล ${prev.length + 1}`,
+              items: [],
+            },
+          ]);
+        }}
+      >
+        <IonIcon icon={add} />
+        เพิ่มบิล
+      </IonButton>
     </>
   );
 };

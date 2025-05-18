@@ -110,7 +110,17 @@ const Persons = ({ persons, setPersons, bills, setBills }: PersonProps) => {
   };
   return (
     <IonGrid>
-      <IonRow>
+      {/* Header row with styles and rounded top corners */}
+      <IonRow
+        style={{
+          backgroundColor: "var(--ion-color-step-150)",
+          color: "var(--ion-text-color)",
+          fontWeight: "bold",
+          padding: "10px 0",
+          borderTopLeftRadius: "10px",
+          borderTopRightRadius: "10px",
+        }}
+      >
         <IonCol size="4" sizeMd="4" className="ion-text-center">
           ชื่อ
         </IonCol>
@@ -121,15 +131,32 @@ const Persons = ({ persons, setPersons, bills, setBills }: PersonProps) => {
           เงินที่ต้องจ่ายทั้งหมด
         </IonCol>
       </IonRow>
-      {Object.entries(payments).map(([payer]) => {
+
+      {Object.entries(payments).map(([payer], iIndex) => {
         const person = persons.find((person) => person.id === payer);
         if (!person) return null;
+
+        // Determine even/odd for alternating background colors
+        const isEven = iIndex % 2 === 0;
+        // Check if last element for bottom border radius
+        const isLast = iIndex === Object.entries(payments).length - 1;
+
         return (
           <IonRow
             key={payer}
             onClick={() => {
               setCurrentPerson(person);
               setPersonsModalOpen(true);
+            }}
+            style={{
+              background: isEven
+                ? "var(--ion-color-step-50)"
+                : "var(--ion-color-step-100)",
+              margin: "4px 0",
+              padding: "8px 0",
+              cursor: "pointer",
+              borderBottomLeftRadius: isLast ? "10px" : "0",
+              borderBottomRightRadius: isLast ? "10px" : "0",
             }}
           >
             <IonCol size="4" sizeMd="4" className="ion-text-center">
@@ -162,7 +189,10 @@ const Persons = ({ persons, setPersons, bills, setBills }: PersonProps) => {
                         }),
                       }}
                     >
-                      {receiverPerson.name} : {amount} บาท
+                      {receiverPerson.name === ""
+                        ? "ยังไม่ได้ระบุชื่อ"
+                        : receiverPerson.name}{" "}
+                      : {amount} บาท
                     </IonChip>
                   );
                 })}
@@ -173,6 +203,8 @@ const Persons = ({ persons, setPersons, bills, setBills }: PersonProps) => {
           </IonRow>
         );
       })}
+
+      {/* The last input and button row - keep as is or style separately */}
       <IonRow>
         <IonCol
           size="9"
@@ -221,12 +253,12 @@ const Persons = ({ persons, setPersons, bills, setBills }: PersonProps) => {
         </IonCol>
       </IonRow>
 
+      {/* Modal remains unchanged */}
       <IonModal
         isOpen={personsModalOpen && currentPerson !== null}
         onDidDismiss={() => setPersonsModalOpen(false)}
         breakpoints={[0, 0.5, 0.8]}
         initialBreakpoint={0.5}
-        //   ref={billModalRef}
       >
         {currentPerson && (
           <ExplanModal
