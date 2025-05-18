@@ -80,7 +80,7 @@ const StandAlone: React.FC = () => {
           {step < 2 && (
             <IonCol size={"12"}>
               <IonButton expand="full" onClick={nextStep}>
-                ถัดไป
+                สรุปค่าใช้จ่าย
               </IonButton>
             </IonCol>
           )}
