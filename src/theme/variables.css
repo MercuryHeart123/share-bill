@@ -5,6 +5,13 @@
   --ion-color-step-50: #ffffff;
   --ion-color-step-100: #f5f5f5;
   --ion-color-step-150: #e0e0e0;
+  --ion-color-step-200: #c0c0c0;
+  --ion-color-step-250: #a0a0a0;
+  --ion-color-step-300: #808080;
+  --ion-color-step-350: #606060;
+  --ion-color-step-400: #404040;
+  --ion-color-step-450: #202020;
+  --ion-color-step-500: #000000;
   --ion-font-family: "Mitr", sans-serif;
 }
 
@@ -18,4 +25,11 @@ body.dark {
   --ion-color-step-50: #1e1e1e;
   --ion-color-step-100: #2a2a2a;
   --ion-color-step-150: #3a3a3a;
+  --ion-color-step-200: #4a4a4a;
+  --ion-color-step-250: #5a5a5a;
+  --ion-color-step-300: #6a6a6a;
+  --ion-color-step-350: #7a7a7a;
+  --ion-color-step-400: #8a8a8a;
+  --ion-color-step-450: #9a9a9a;
+  --ion-color-step-500: #aaaaaa;
 }

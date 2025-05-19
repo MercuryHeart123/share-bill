@@ -121,85 +121,128 @@ const ItemModal = ({
               }}
             />
           </IonItem>
-          {persons.length !== 0 && (
+          {persons.length !== 0 && currentEdit && (
             <>
               <IonItem lines="none" style={{ padding: "0px" }}>
-                คนที่หาร
+                คนที่หาร{" "}
+                {`(${currentEdit?.persons.length} คน คนละ ${
+                  currentEdit?.sum === 0 || currentEdit?.persons.length === 0
+                    ? "0"
+                    : (
+                        (currentEdit?.sum || 0) / currentEdit?.persons.length
+                      ).toLocaleString("en-US", {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2,
+                      })
+                } บาท)`}
               </IonItem>
               <IonItem lines="full">
                 <div
                   style={{
                     display: "flex",
-                    flexWrap: "wrap", // Allow chips to wrap to the next line
-                    gap: "2px", // Optional: adds space between the chips
-                    paddingBottom: "20px",
+                    flexDirection: "column",
+                    width: "100%",
                   }}
                 >
-                  {persons.map((person) => {
-                    const isPersonInList = currentEdit?.persons.includes(
-                      person.id
-                    );
-                    return (
-                      <IonChip
-                        key={person.id}
-                        style={{
-                          ...(isPersonInList
-                            ? {
-                                color: calculateColor({
-                                  color: person.color,
-                                  isTextColor: true,
-                                }),
-                                backgroundColor: calculateColor({
-                                  color: person.color,
-                                  isTextColor: false,
-                                }),
-                              }
-                            : {}),
-                          borderRadius: "5px",
-                        }}
-                        onClick={() => {
-                          if (!currentEdit) return;
-                          setCurrentEditItem((prev) =>
-                            prev
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap", // Allow chips to wrap to the next line
+                      gap: "2px", // Optional: adds space between the chips
+                    }}
+                  >
+                    {persons.map((person) => {
+                      const isPersonInList = currentEdit?.persons.includes(
+                        person.id
+                      );
+                      return (
+                        <IonChip
+                          key={person.id}
+                          style={{
+                            ...(isPersonInList
                               ? {
-                                  ...prev,
-                                  persons: prev.persons.includes(person.id)
-                                    ? prev.persons.filter(
-                                        (id) => id !== person.id
-                                      )
-                                    : [...prev.persons, person.id],
+                                  color: calculateColor({
+                                    color: person.color,
+                                    isTextColor: true,
+                                  }),
+                                  backgroundColor: calculateColor({
+                                    color: person.color,
+                                    isTextColor: false,
+                                  }),
                                 }
-                              : null
-                          );
-                        }}
-                      >
-                        {isPersonInList ? (
-                          <IonIcon
-                            icon={checkmark}
-                            style={{
-                              margin: "0px",
-                              ...(isPersonInList
+                              : {}),
+                            borderRadius: "5px",
+                          }}
+                          onClick={() => {
+                            if (!currentEdit) return;
+                            setCurrentEditItem((prev) =>
+                              prev
                                 ? {
-                                    color: calculateColor({
-                                      color: person.color,
-                                      isTextColor: true,
-                                    }),
+                                    ...prev,
+                                    persons: prev.persons.includes(person.id)
+                                      ? prev.persons.filter(
+                                          (id) => id !== person.id
+                                        )
+                                      : [...prev.persons, person.id],
                                   }
-                                : {}),
-                            }}
-                          />
-                        ) : (
-                          <IonIcon
-                            icon={add}
-                            style={{
-                              margin: "0px",
-                            }}
-                          />
-                        )}
-                        {person.name || "ยังไม่ได้ระบุชื่อ"}
-                      </IonChip>
-                    );
-                  })}
+                                : null
+                            );
+                          }}
+                        >
+                          {isPersonInList ? (
+                            <IonIcon
+                              icon={checkmark}
+                              style={{
+                                margin: "0px",
+                                ...(isPersonInList
+                                  ? {
+                                      color: calculateColor({
+                                        color: person.color,
+                                        isTextColor: true,
+                                      }),
+                                    }
+                                  : {}),
+                              }}
+                            />
+                          ) : (
+                            <IonIcon
+                              icon={add}
+                              style={{
+                                margin: "0px",
+                              }}
+                            />
+                          )}
+                          {person.name || "ยังไม่ได้ระบุชื่อ"}
+                        </IonChip>
+                      );
+                    })}
+                  </div>
+                  <IonButton
+                    expand="full"
+                    color={"medium"}
+                    style={{
+                      margin: "16px 0px",
+                    }}
+                    onClick={() => {
+                      setCurrentEditItem((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              persons:
+                                prev.persons.length === persons.length
+                                  ? []
+                                  : persons.map((person) => person.id),
+                            }
+                          : null
+                      );
+                    }}
+                  >
+                    <IonIcon icon={add} />
+                    {"  "}
+                    {currentEdit?.persons.length === persons.length
+                      ? "ยกเลิกเลือกทั้งหมด"
+                      : "เลือกทั้งหมด"}
+                  </IonButton>
                 </div>
               </IonItem>
             </>
